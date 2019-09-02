@@ -1,7 +1,3 @@
-# испортируем модули стандартнй библиотеки uuid и datetime
-# import uuid
-# import datetime
-
 # импортируем библиотеку sqlalchemy и некоторые функции из нее 
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
@@ -21,7 +17,6 @@ class User(Base):
     __tablename__ = 'user'
 
     # идентификатор пользователя, первичный ключ
-    #id = sa.Column(sa.String(36), primary_key=True)
     id = sa.Column(sa.Integer, nullable=False, unique=True, autoincrement=True, primary_key=True)
     # имя пользователя
     first_name = sa.Column(sa.Text)
@@ -35,19 +30,6 @@ class User(Base):
     birthdate = sa.Column(sa.Text)
     #рост
     height = sa.Column(sa.Float)
-
-
-# class LastSeenLog(Base):
-#     """
-#     Описывает структуру таблицу log для хранения времени последней активности пользователя
-#     """
-#     # задаем название таблицы
-#     __tablename__ = 'log'
-
-#     # идентификатор пользователя, первичный ключ
-#     id = sa.Column(sa.String(36), primary_key=True)
-#     # время последней активности пользователя
-#     timestamp = sa.Column(sa.DATETIME)
 
 
 def connect_db():
@@ -77,8 +59,6 @@ def request_data():
     email = input("Мне еще понадобится адрес твоей электронной почты: ")
     birthdate = input("Напиши свою дату рождения (ГГГГ-ММ-ДД): ")
     height = input("Напиши свой рост (в метрах, например 1.72): ")
-    # генерируем идентификатор пользователя и сохраняем его строковое представление
-    #user_id = str(uuid.uuid4())
     # создаем нового пользователя
     user = User(
         #id=user_id,
@@ -102,30 +82,8 @@ def find(name, session):
     # подсчитываем количество таких записей в таблице с помощью метода .count()
     users_cnt = query.count()
     # составляем список идентификаторов всех найденных пользователей
-    #user_ids = [user.id for user in query.all()]
-    # находим все записи в таблице LastSeenLog, у которых идентификатор совпадает с одним из найденных
-    # last_seen_query = session.query(LastSeenLog).filter(LastSeenLog.id.in_(user_ids))
-    # строим словарь вида идентификатор_пользователя: время_его_последней_активности
-    # log = {log.id: log.timestamp for log in last_seen_query.all()}
     # возвращаем кортеж количество_найденных_пользователей, список_идентификаторов, словарь_времени_активности
     return (users_cnt, query.all())
-
-
-# def update_timestamp(user_id, session):
-#     """
-#     Обновляет время последней активности пользоватля с заданным идентификатором user_id
-#     """
-#     # находим запись в журнале о пользователе с идентификатором user_id
-#     log_entry = session.query(LastSeenLog).filter(LastSeenLog.id == user_id).first()
-#     # проверяем есть уже в журнале запись о таком пользователе
-#     if log_entry is None:
-#         # если записи не оказалось в журнале, создаем новую
-#         log_entry = LastSeenLog(id=user_id)
-
-#     # обновляем время последней активности пользователя на текущее
-#     log_entry.timestamp = datetime.datetime.now()
-#     return log_entry
-
 
 def print_users_list(cnt, users):
     """
@@ -140,9 +98,6 @@ def print_users_list(cnt, users):
         print("Идентификатор пользвоателя и его данные")
         # проходимся по каждому идентификатору
         for user in users:
-            # получаем время последней активности из словаря last_seen_log
-            # last_seen = last_seen_log[user_id]
-            # выводим на экран идентификатор - время_последней_активности
             print("{} {} {} {} {} {} {}".format(user.id, user.first_name, user.last_name, user.gender, user.email, user.birthdate, user.height))
     else:
         # если список оказался пустым, выводим сообщение об этом
@@ -170,10 +125,6 @@ def main():
         user = request_data()
         # добавляем нового пользователя в сессию
         session.add(user)
-        # обновляем время последнего визита для этого пользователя
-        # log_entry = update_timestamp(user.id, session)
-        # # добавляем объект log_entry в сессию
-        # session.add(log_entry)
         # # сохраняем все изменения, накопленные в сессии
         session.commit()
         print("Спасибо, данные сохранены!")
